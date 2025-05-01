@@ -1,4 +1,4 @@
 *.sum
 
 .venv/*
-gen/*
+server/gen/*

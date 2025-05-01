@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package org.sill;
+package proto.base;
 
-option go_package = "org.sill/base";
+option go_package = "org.sill/gen/proto/base;base";
 
 service Greeter {
   rpc SayHello (GreeterRequest) returns (GreeterResponse) {}
