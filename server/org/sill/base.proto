@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package org.sill;
+
+option "github.com/Sill-William/calculate_normal/gen/org/sill;sillbase";
+
+service Greeter {
+  rpc SayHello (GreeterRequest) returns (GreeterResponse) {}
+}
+
+message GreeterRequest {
+  string name = 1;
+}
+
+message GreeterResponse {
+  string name = 1;
+}

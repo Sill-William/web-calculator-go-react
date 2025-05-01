@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package calculator_normal;
-
-service Greeter {
-  rpc SayHello ()  
-}
