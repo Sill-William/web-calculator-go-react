@@ -1,3 +1,4 @@
 *.sum
 
 .venv/*
+gen/*
