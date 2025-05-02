@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package pts.f.v1;
 
-option go_package = "org.sill.webcalculator/pts/f/v1";
+option go_package = "org.sill.webcalculator/gen/pts/f/v1";
 
 message CalculateRequest {
   int32 prior = 1;

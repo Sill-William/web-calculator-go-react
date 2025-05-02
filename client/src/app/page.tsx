@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 type gRPCRequest = {
   "prior": number | null,
@@ -13,26 +13,33 @@ type gRPCResponse = {
 }
 
 export default function Home() {
-  let opReq: gRPCRequest = {
+  // let opReq: gRPCRequest = {
+  //   "prior": null,
+  //   "post": null,
+  //   "op": null,
+  // };
+  const opReq = useRef<gRPCRequest>({
     "prior": null,
     "post": null,
     "op": null,
-  };
+  })
   let [board, setBoard] = useState(0);
   let [op, setOp] = useState<number | null>(null);
   let [isNagative, setNegative] = useState(0);
   let [isErr, setErr] = useState(false);
+
   let push = (n: number) => {
-    console.debug(op)
+    if (isErr) {
+      setErr(false);
+    }
     if (op !== null && n !== -1 && n !== -2) {
-      if (opReq.post !== null) {
+      if (opReq.current.post !== null) {
         // TODO
-        // opReq.prior = opReq.post;
         calc();
-        opReq.post = null;
+        opReq.current.post = null;
       }
-      opReq.prior = board * isNagative === 1 ? -1 : 1;
-      opReq.op = op;
+      // opReq.prior = board * isNagative === 1 ? -1 : 1;
+      opReq.current.prior = board * (isNagative === 1 ? -1 : 1);
       setNegative(0);
       setBoard(n);
       setOp(null);
@@ -47,12 +54,22 @@ export default function Home() {
           setBoard(n);
           return;
         }
+        setBoard(board * 10 + n);
+        break;
       case -1:
+        opReq.current = {
+          "prior": null,
+          "post": null,
+          "op": null,
+        }
         setBoard(0);
         setOp(null);
         return;
       case -2:
         setBoard(Math.floor(board / 10));
+        if (board === 0 && isNagative === 1) {
+          setNegative(0);
+        }
         return;
       default:
         setBoard(board * 10 + n);
@@ -60,17 +77,33 @@ export default function Home() {
   }
   let pressOp = (pop: number) => {
     if (pop === op) {
+      console.debug("press same op")
       setOp(null);
       return;
     }
+    // if (opReq.current.prior !== null ) {
+    //   calc();
+    //   opReq.current.post = null;
+    //   console.debug("after calc, now opReq is", opReq.cu rrent);
+    // }
     setOp(pop);
-    opReq.op = pop;
+    // opReq.op = pop;
+    opReq.current.op = pop;
   }
   let calc = () => {
-    if (opReq.post === null) {
-      return;
+    console.debug("origin opReq is", opReq.current);
+    if (opReq.current.post === null) {
+      // opReq.post = board * isNagative === 1 ? -1 : 1;
+      // setOpReqFields(["post"], [board * (isNagative === 1 ? -1 : 1),]);
+      console.debug("now board", board);
+      opReq.current.post = board * (isNagative === 1 ? -1 : 1);
+      console.debug("now set opReqs post");
+      setNegative(0);
     }
-    const res = mockBak(opReq);
+    console.debug("opReg is", opReq.current);
+    const res = mockBak(opReq.current);
+    // TODO: use gRPC to connect server and get result
+    console.debug("mock res is", res);
     if (res.result === null) {
       setBoard(0);
       return;
@@ -80,33 +113,34 @@ export default function Home() {
       setNegative(1);
     }
     setOp(null);
-    opReq.prior = res.result;
+    // opReq.prior = res.result;
+    opReq.current.prior = res.result;
   }
-  let mockBak = (req: gRPCRequest) => {
-    let result = {
-      "result": 0,
-    }
-    switch (req.op) {
-      case 0:
-        result.result = req.prior! + req.post!;
-        break;
-      case 1:
-        result.result = req.prior! - req.post!;
-        break;
-      case 2:
-        result.result = req.prior! * req.post!;
-        break;
-      case 3:
-        if (req.post === 0) {
-          result.result = 0;
-          setErr(true);
-          break;
-        }
-        result.result = req.prior! / req.post!;
-        break;
-    }
-    return result;
-  }
+  // let mockBak = (req: gRPCRequest) => {
+  //   let result = {
+  //     "result": 0,
+  //   }
+  //   switch (req.op) {
+  //     case 0:
+  //       result.result = req.prior! + req.post!;
+  //       break;
+  //     case 1:
+  //       result.result = req.prior! - req.post!;
+  //       break;
+  //     case 2:
+  //       result.result = req.prior! * req.post!;
+  //       break;
+  //     case 3:
+  //       if (req.post === 0) {
+  //         result.result = 0;
+  //         setErr(true);
+  //         break;
+  //       }
+  //       result.result = req.prior! / req.post!;
+  //       break;
+  //   }
+  //   return result;
+  // }
 
   return (
     <div 
@@ -133,7 +167,7 @@ export default function Home() {
             <div className="col-start-1 col-end-2 row-start-2 row-start-3 flex items-center justify-center text-xl">
               {isNagative === 0 ? "" : "-"}
             </div>
-            <div className="col-start-1 col-end-2 row-start-3 row-start-4 flex items-center justify-center text-xl">
+            <div className="col-start-1 col-end-2 row-start-3 row-start-4 flex items-center justify-center text-xs">
               {isErr ? "ERR" : ""}
             </div>
           </div>
@@ -146,11 +180,13 @@ export default function Home() {
         </div>
         <div
           className="bg-gray-300 col-start-2 col-end-3 row-start-2 row-end-3 flex items-center justify-center text-4xl hover:bg-gray-600 cursor-default"
+          onClick={() => { pressOp(3) }}
         >
           /
         </div>
         <div
           className="bg-gray-300 col-start-3 col-end-4 row-start-2 row-end-3 flex items-center justify-center text-4xl hover:bg-gray-600 cursor-default"
+          onClick={() => { pressOp(2) }}
         >
           *
         </div>

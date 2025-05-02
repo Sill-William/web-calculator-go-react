@@ -1,5 +1,0 @@
-version: v1
-plugins:
-  - name: js
-    out: ./generated/js
-    opt: grpc=1,import_style=commonjs,esModuleInterop=true
