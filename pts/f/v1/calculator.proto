@@ -5,10 +5,9 @@ package pts.f.v1;
 option go_package = "org.sill.webcalculator/pts/f/v1";
 
 message CalculateRequest {
-  int32 pre_minus = 1;
-  int32 prior = 2;
-  int32 post = 3;
-  int32 cal_m = 4;
+  int32 prior = 1;
+  int32 post = 2;
+  int32 cal_m = 3;
 }
 
 message CalculateResponse {
