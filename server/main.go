@@ -7,8 +7,6 @@ import (
 	"net/http"
 
 	"connectrpc.com/connect"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
 	v1 "org.sill.webcalculator/gen/pts/f/v1"
 	"org.sill.webcalculator/gen/pts/f/v1/v1connect"
 )
@@ -39,14 +37,34 @@ func (s *Calculator) Calculate(
 	}
 }
 
+// CORS 中间件
+func enableCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// 允许的域名（生产环境应替换为具体域名）
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		// 允许的请求方法
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+		// 允许的请求头
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Connect-Protocol-Version")
+		// 预检请求（OPTIONS）直接返回 200
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	cal := &Calculator{}
 	mux := http.NewServeMux()
 	path, handler := v1connect.NewCalculatorServiceHandler(cal)
 	mux.Handle(path, handler)
 	log.Println("Listening on localhost:8080")
+	corsHandler := enableCORS(mux)
 	http.ListenAndServe(
 		"localhost:8080",
-		h2c.NewHandler(mux, &http2.Server{}),
+		// h2c.NewHandler(mux, &http2.Server{}),
+		corsHandler,
 	)
 }

@@ -1,6 +1,9 @@
 'use client'
 
+import { createClient } from "@connectrpc/connect";
+import { createConnectTransport } from "@connectrpc/connect-web";
 import { useRef, useState } from "react";
+import { CalculatorService } from "./calculator_pb";
 
 type gRPCRequest = {
   "prior": number | null,
@@ -18,6 +21,9 @@ export default function Home() {
   //   "post": null,
   //   "op": null,
   // };
+  const transport = createConnectTransport({
+    baseUrl: "http://localhost:8080"
+  });
   const opReq = useRef<gRPCRequest>({
     "prior": null,
     "post": null,
@@ -90,7 +96,7 @@ export default function Home() {
     // opReq.op = pop;
     opReq.current.op = pop;
   }
-  let calc = () => {
+  let calc = async () => {
     console.debug("origin opReq is", opReq.current);
     if (opReq.current.post === null) {
       // opReq.post = board * isNagative === 1 ? -1 : 1;
@@ -101,8 +107,9 @@ export default function Home() {
       setNegative(0);
     }
     console.debug("opReg is", opReq.current);
-    const res = mockBak(opReq.current);
+    // const res = mockBak(opReq.current);
     // TODO: use gRPC to connect server and get result
+    const res = await toBak(opReq.current);
     console.debug("mock res is", res);
     if (res.result === null) {
       setBoard(0);
@@ -115,6 +122,16 @@ export default function Home() {
     setOp(null);
     // opReq.prior = res.result;
     opReq.current.prior = res.result;
+  }
+  let toBak = async (req: gRPCRequest) => {
+    const client = createClient(CalculatorService, transport);
+    const res = await client.calculate({
+      prior: req.prior!,
+      post: req.post!,
+      op: req.op!,
+    });
+    console.debug("remote response is", res);
+    return { result: res.result };
   }
   // let mockBak = (req: gRPCRequest) => {
   //   let result = {

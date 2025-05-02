@@ -1,0 +1,19 @@
+{
+  "name": "web-calculator-go-react",
+  "version": "1.0.0",
+  "description": "a simple web calculator powered by go-connectRPC and next.js. for test from zenai.intl@gmail.com",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@bufbuild/buf": "^1.53.0",
+    "@bufbuild/protobuf": "^2.2.5",
+    "@bufbuild/protoc-gen-es": "^2.2.5",
+    "@connectrpc/connect": "^2.0.2",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

@@ -6,5 +6,11 @@ plugins:
   - local: protoc-gen-connect-go
     out: gen
     opt: paths=source_relative
-  - remote: buf.build/protocolbuffers/js:v3.21.4
-    out: ./gen/gen-js/
+  # - remote: buf.build/protocolbuffers/js:v3.21.4
+  #   out: ./gen/gen-js/
+  #   include_imports: true
+  - local: protoc-gen-es
+    out: gen/gen-es
+    # Also generate any imported dependencies
+    include_imports: true
+    opt: target=ts
