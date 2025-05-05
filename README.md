@@ -5,6 +5,8 @@ a simple web calculator powered by go-connectRPC and next.js. for test from zena
 
 ### Install Dependencies
 
+- clone this repo
+
 - install go dependencies
 ```sh
 # <repo-root>/
@@ -18,6 +20,13 @@ npx tsc --init
 npm install @bufbuild/buf @bufbuild/protobuf @bufbuild/protoc-gen-es @connectrpc/connect
 ```
 
+- install node dependencies
+```sh
+cd <repo-root>/client/
+
+npm install
+```
+
 ## Build
 
 - use `buf`
@@ -29,3 +38,21 @@ npx buf generate
 
 mv <repo-root>/gen-es/pts/f/v1/calculator_pb.ts <repo-root>/client/src/app/
 ```
+
+## Run
+
+- start server
+```sh
+cd <repo-root>/
+go get golang.org/x/net/http2
+go get connectrpc.com/connect
+go run ./server/main.go
+```
+
+- start client
+```sh
+npm run dev
+```
+
+## Sample Pictrue
+![image](https://github.com/Sill-William/web-calculator-go-react/blob/main/static/sample.png?raw=true)
